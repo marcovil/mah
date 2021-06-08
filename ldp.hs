@@ -26,8 +26,27 @@ addList (x:xs) (y:ys) = (x + y) : addList xs ys
 
 fib = 1:(addList fib (0:fib))
 
-reverse1 :: [a] -> [a]
-reverse1 l = foldl (\xs x -> x:xs) [] l
+-- reverse e' gia' una funzione di libreria
 
-reverse2 :: [a] -> [a]
-reverse2 l = foldr (\x xs -> xs ++ [x]) [] l
+reverse1 [] = []
+reverse1 (x:xs) = reverse xs ++ [x]
+
+-- ma reverse1 complessita' quadratica
+-- concatenzione ha costo proporzionale a lunghezza prima lista
+-- operatore ++ lineare sul primo argomento
+
+reverse2 xs = reverse2' xs [] where
+  reverse2' [] ys = ys
+  reverse2' (x:xs) ys = reverse2' xs (x:ys)
+
+-- reverse2 ha anche ricorsione di coda
+
+reverse3 :: [a] -> [a]
+reverse3 l = foldl (\xs x -> x:xs) [] l
+-- foldl prende per primo l'elemento calcolato in precedenza
+-- e qui si tratta di una lista (xs la lista gia' invertita)
+-- e poi la testa della lista su cui deve lavorare
+
+reverse4 :: [a] -> [a]
+reverse4 l = foldr (\x xs -> xs ++ [x]) [] l
+-- pero' qui sono costretto a usare la concatenazione di liste
