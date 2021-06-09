@@ -50,3 +50,58 @@ reverse3 l = foldl (\xs x -> x:xs) [] l
 reverse4 :: [a] -> [a]
 reverse4 l = foldr (\x xs -> xs ++ [x]) [] l
 -- pero' qui sono costretto a usare la concatenazione di liste
+
+sumeven [] = 0
+sumeven (x:xs) | (mod x 2) == 0 = x + sumeven xs
+               | otherwise = sumeven xs
+
+sumodd = \ys ->
+  case ys of [] -> 0
+             (x:xs) | (mod x 2) == 0 -> sumodd xs
+                    | True -> x + sumodd xs
+
+data Point1 = Pt1 {xCoord, yCoord :: Float}
+x1 = Pt1 4 5
+y1 = xCoord x1
+y2 = yCoord x1
+
+-- sommaPari con ricorsione di coda
+sommaPari2 xs = sommaPariAux xs 0
+  where sommaPariAux [] n = n
+        sommaPariAux (x:xs) n | (mod x 2) == 0 = sommaPariAux xs (x+n)
+                              | otherwise = sommaPariAux xs n
+
+-- sommaPari con foldl
+sommaPari3 xs = foldl (\acc x -> if (mod x 2) == 0 then x + acc else acc) 0 xs
+
+-- sommaPari con foldr
+sommaPari4 xs = foldr (\x acc -> if (mod x 2) == 0 then x + acc else acc) 0 xs
+
+-- map con pattern matching
+map1 f [] = []
+map1 f (x:xs) = f x : map1 f xs
+
+-- map con case
+map2 f xs = case xs of
+  [] -> []
+  (x:xs) -> f x : map2 f xs
+
+-- map con ricorsione di coda
+map3 f xs = map3Aux f xs []
+  where map3Aux f [] ys = reverse ys
+        map3Aux f (x:xs) ys = map3Aux f xs (f x:ys)
+-- potevo fare l'append ma costava di piu'
+
+-- map con foldl
+map4 f xs = foldl (\xs x -> xs ++ [f x]) [] xs
+
+-- map con foldr
+map5 f xs = foldr (\x xs -> f x : xs) [] xs
+
+data BTree a = Null | Bt a (Bt a) (Bt a)
+
+sumBT Null = 0
+sumBT (Bt n tL tR) = n + sumBT tL + sumBT tL
+
+depthBT Null = 0
+depthBT (Bt n tL tR) = 1 + max (depthBT tL) (depthBT tR)
