@@ -85,3 +85,67 @@ data Tree a = Voidgen | Nodegen a [ Tree a ]
 
 -- 5.1 generalizzazione della foldr per alberi generici
 
+--
+
+data QT a = C a | Q ( QT a ) ( QT a ) ( QT a ) ( QT a )
+  deriving ( Eq , Show )
+
+-- 6.1 da 4 QuadTree a un QuadTree
+buildNSimplify :: ( Eq a, Show a ) => QT a -> QT a -> QT a -> QT a -> QT a
+buildNSimplify (C x) (C y) (C z) (C w) = if x == y && y == z && z == w
+                                         then C x
+                                         else Q (C x) (C y) (C z) (C w)
+buildNSimplify q1 q2 q3 q4 = Q q1 q2 q3 q4
+
+c1 = C 1
+c2 = C 2
+c3 = C 3
+c4 = C 4
+c19 = C 19
+c20 = C 20
+qt1 = Q c1 c2 c3 c3
+qt2 = Q c2 c2 c3 c1
+qt3 = Q c3 c3 c3 c2
+qt4 = Q c3 c3 c2 c1
+qt5 = Q c1 c1 c1 c1
+qt6 = Q qt1 qt2 qt3 qt1
+
+-- 6.2 da un termine di tipo QT a un QuadTree
+simplify :: ( Eq a, Show a ) => QT a -> QT a
+simplify (Q (C x) (C y) (C z) (C w)) = if x == y && y == z && z == w
+                                       then C x
+                                       else Q (C x) (C y) (C z) (C w)
+simplify (Q x1 x2 x3 x4) = (Q x1 x2 x3 x4) 
+
+-- 6.3 data funzione f e QuadTree q mapQT applica f a tutti i pixel
+-- dell'immagine codificata da q
+mapQT :: ( Eq a, Show a ) => (a -> b) -> QT a -> QT b
+mapQT f (C x) = C (f x)
+mapQT f (Q x1 x2 x3 x4) = Q (mapQT f x1) (mapQT f x2) (mapQT f x3) (mapQT f x4)
+
+-- 6.4 dato un QuadTree determina il numero (minimo) di
+-- pixel di quell’immagine
+howManyPixels :: ( Eq a, Show a ) => QT a -> Int
+howManyPixels (C _) = 1
+howManyPixels (Q x1 x2 x3 x4) = let hmp1 = howManyPixels x1
+                                    hmp2 = howManyPixels x2
+                                    hmp3 = howManyPixels x3
+                                    hmp4 = howManyPixels x4
+                                    in 4 * maximum [hmp1, hmp2, hmp3, hmp4]
+
+z = C 0
+u = C 1
+q = Q z u u u
+
+-- 6.5 dato colore c e lista di QuadTrees costruisce lista QuadTrees che
+-- codificano immagini i cui colori sono limitati a c (pixel originale
+-- se colore e' < c, c altrimenti
+limitAll :: ( Eq a, Show a, Ord a ) => a -> [QT a] -> [QT a]
+limitAll c [] = []
+limitAll c (x:xs) = mapQT (\x -> if x < c then x else c) x : limitAll c xs
+
+qt7 = Q c19 c20 c4 c3
+qt8 = Q c4 c3 c3 c2
+qt9 = Q c20 c20 c20 c20
+qt10 = c20
+qt11 = Q qt7 qt8 qt1 qt9
