@@ -62,6 +62,9 @@ data BST a = Void | Node {
   left , right :: BST a
   } deriving ( Eq , Ord , Read , Show )
 
+bst1 = Void
+bst2 = Node 40 (Node 30 Void Void) (Node 90 (Node 50 Void Void) Void)
+
 -- 4.1 funzione che calcola la somma dei valori di un albero a valori sommabili
 treesum :: Num a => BST a -> a
 treesum Void = 0
@@ -80,8 +83,26 @@ sumoddtree (Node x l r) = if odd x
 samesums :: (Num a, Eq a) => [BST a] -> Bool
 samesums l = same (map treesum l)
 
+-- 4.4 predicato per determinare se un valore e' presente in un BST
+bstElem :: ( Ord a , Show a , Read a ) => a -> BST a -> Bool
+bstElem y Void = False
+bstElem y (Node x l r) = if y == x then True else bstElem y l || bstElem y r
+
+-- 4.5 inserimento di valore x in albero t
+-- (ipotesi valori unici nell'albero)
+insertInBST :: ( Ord a , Show a , Read a ) => a -> BST a -> BST a
+insertInBST n Void = Node n Void Void
+insertInBST n (Node x l r) = if n < x then Node x (insertInBST n l) r else Node x l (insertInBST n r)
+
+-- 4.6 lista ordinata degli elementi di un BST
+bst2List :: ( Ord a , Show a , Read a ) => BST a -> [a]
+bst2List tree = bst2List' tree [] where
+  bst2List' Void acc = acc
+  bst2List' (Node x l r) acc = bst2List' l (x : bst2List' r acc)
+
 data Tree a = Voidgen | Nodegen a [ Tree a ]
   deriving ( Eq , Show )
+
 
 -- 5.1 generalizzazione della foldr per alberi generici
 
@@ -149,3 +170,8 @@ qt8 = Q c4 c3 c3 c2
 qt9 = Q c20 c20 c20 c20
 qt10 = c20
 qt11 = Q qt7 qt8 qt1 qt9
+
+-- 6.6 dato un QuadTree e un colore determina il numero minimo di pixel
+-- di quel colore
+-- occurencies :: ( Eq a, Show a ) => QT a -> a -> Int
+-- occurencies 
