@@ -1,0 +1,9 @@
+io ho questo file in cui ci sono dei numeri
+non divisibili per quattro (come 1, 2, 3, 5, 6, 7, 9, 10)
+e altri divisibili per quattro (come 0, 4, 8)
+come per esempio 84 28 5372 e 49748 ma anche
+per esempio 3654 9 127 233 431 66666678687607
+potrei anche avere caratteri strani come -- + = "'[]{}l;';';l
+ma non dovrebbe essere un problema come anche questi !@#$%^&*()_+{}:"<>??><,./;'[]
+se invece abbiamo un multiplo di quattro come 88888888888880 oppure 12312312312312348
+abbiamo un match. roba strana come 34--43432--4-4-3 cosa succede?

@@ -148,4 +148,6 @@ mult x y = y + mult (x-1) y
 
 data Tree a = Leaf a | Node (Tree a) (Tree a)
 
--- fp14
+generaCoppia nEsercizi matricola = (primo, secondo) where 
+  primo = matricola `mod` nEsercizi + 1
+  secondo = (matricola `mod` (nEsercizi - 3) + primo + 1) `mod`  nEsercizi + 1

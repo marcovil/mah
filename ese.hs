@@ -24,6 +24,13 @@ so [] = 0
 so [x] = x
 so (x1:x2:xs) = x1 + so xs
 
+-- 2.3 quicksort polimorfo
+quicksort :: (Ord a) => [a] -> [a]
+quicksort [] = []
+quicksort (x:xs) = quicksort smaller ++ [x] ++ quicksort bigger where
+  smaller = [y | y <- xs, y <= x]
+  bigger = [y | y <- xs, y > x]
+
 -- 2.5 funzione che costruisce, a partire da una lista di numeri interi,
 -- una lista di coppie in cui
 -- (a) il primo elemento di ogni coppia è uguale all’elemento di
@@ -33,6 +40,17 @@ so (x1:x2:xs) = x1 + so xs
 listc :: [Int] -> [(Int,Int)]
 listc [] = []
 listc (x:xs) = (x,foldr (+) 0 xs) : (listc xs)
+
+-- 2.6 funzione che costruisce, a partire da una lista di numeri interi
+-- una lista di coppie in cui
+-- (a) il primo elemento di ogni coppia è uguale all’elemento
+-- di corrispondente posizione nella lista originale e
+-- (b) il secondo elemento di ogni coppia è uguale alla somma
+-- di tutti gli elementi antecedenti della lista originale.
+couples :: [Int] -> [(Int,Int)]
+couples xs = couplesAux xs 0 where
+  couplesAux [] acc = []
+  couplesAux (x:xs) acc = (x,acc) : couplesAux xs (acc + x)
 
 -- 3.1 matrix_dim data una matrice ne calcola le dimensioni, se la matrice è
 -- ben formata, altrimenti restituisce (-1,-1)
@@ -89,10 +107,9 @@ bstElem y Void = False
 bstElem y (Node x l r) = if y == x then True else bstElem y l || bstElem y r
 
 -- 4.5 inserimento di valore x in albero t
--- (ipotesi valori unici nell'albero)
 insertInBST :: ( Ord a , Show a , Read a ) => a -> BST a -> BST a
 insertInBST n Void = Node n Void Void
-insertInBST n (Node x l r) = if n < x then Node x (insertInBST n l) r else Node x l (insertInBST n r)
+insertInBST n (Node x l r) = if n <= x then Node x (insertInBST n l) r else Node x l (insertInBST n r)
 
 -- 4.6 lista ordinata degli elementi di un BST
 bst2List :: ( Ord a , Show a , Read a ) => BST a -> [a]
@@ -100,13 +117,38 @@ bst2List tree = bst2List' tree [] where
   bst2List' Void acc = acc
   bst2List' (Node x l r) acc = bst2List' l (x : bst2List' r acc)
 
-data Tree a = Voidgen | Nodegen a [ Tree a ]
+-- 4.7 ordinamento di liste usando funzione precedente
+sortList :: ( Ord a , Show a , Read a ) => [a] -> [a]
+sortList xs = sortListAux xs Void where
+  sortListAux [] bst = bst2List bst
+  sortListAux (x:xs) bst = sortListAux xs (insertInBST x bst)
+
+-- 4.8 lista ordinata di tutti gli elementi dell'albero t che soddisfano
+-- il predicato p
+filterTree :: ( Ord a , Show a , Read a ) => (a -> Bool) -> BST a -> [a]
+filterTree p t = filterTreeAux p t [] where
+  filterTreeAux p Void acc = acc
+  filterTreeAux p (Node x l r) acc = if p x
+                                        then filterTreeAux p l (x : filterTreeAux p r acc)
+                                             else filterTreeAux p l (filterTreeAux p r acc)
+
+
+data Tree a = VoidT | NodeT a [ Tree a ]
   deriving ( Eq , Show )
 
+alg1 = NodeT 50 [NodeT 60 [], NodeT 70 [VoidT], NodeT 80 [VoidT,VoidT], NodeT 90 [NodeT 180 [NodeT 60 [VoidT,VoidT]]]]
 
 -- 5.1 generalizzazione della foldr per alberi generici
+treefold :: ( Eq a , Show a ) => (a -> [b] -> b ) -> b -> Tree a -> b
+treefold f z VoidT = z
+--treefold f z (NodeT x list) = f x (foldr (\element base -> (treefold f z element) : base) [] list)
+treefold f z (NodeT y []) = f y [z]
+treefold f z (NodeT y (x:xs)) = f y (map (treefold f z) (x:xs))
+  
+-- 5.2
+height tree = treefold (\x xs -> 1 + (maximum xs)) (-1) tree
 
---
+-- 5.1 e 5.2 del tutto da rivedere
 
 data QT a = C a | Q ( QT a ) ( QT a ) ( QT a ) ( QT a )
   deriving ( Eq , Show )
